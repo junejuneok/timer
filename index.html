@@ -1,0 +1,204 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0px;
+            margin: 0px;
+        }
+        .box {
+            background-color: rgb(198, 218, 214);
+            width: 95%;
+            height: 300px;
+            text-align:center;
+            border-radius: 30px;
+            margin: 20px auto;
+            padding-top: 5px;
+        }
+        .timer-title{
+            width: 90%;
+            height: 70px;
+            margin: 0 auto;
+            font-size: 30px;
+            color: black;
+            padding-top: 14px;
+            box-sizing: border-box;
+        }
+        .time{
+            width: 90%;
+            height: 100px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .start-btn{
+            width: 89%;
+            height: 40px;
+            margin: 0 auto;
+            font-size: 25;
+            border-radius: 20px;
+            border: 0;
+            background-color: rgb(108, 116, 118);
+            color: whitesmoke;
+            margin-top: 10px;
+        }
+        .start-btn:focus{
+            outline: none;
+        }
+        .setup{
+            width:40px;
+            height: 40px;
+            margin-left: 250px;
+        }
+        li{
+            display: inline-block;
+            list-style: none;
+            font-size: 50px;
+            margin: 5px;
+        }
+        .stop-btn{
+            width: 89%;
+            height: 40px;
+            margin: 0 auto;
+            font-size: 25;
+            border-radius: 20px;
+            border: 0;
+            background-color: rgb(168, 72, 92);
+            color: whitesmoke;
+            margin-top: 10px;
+        }
+        .stop-btn:focus{
+            outline: none;
+        }
+        .add{
+            border: 1px solid rgb(255, 154, 3);
+            border-radius: 50px;
+            background-color: rgb(255, 154, 3);
+            font-size: 34px;
+            color: rgb(90, 81, 75);
+            position: fixed;
+            top: 550px;
+            width: 50px;
+            height: 50px;
+            right: 20px;
+        }
+        .setup{
+            width: 89%;
+            height: 40px;
+            margin: 0 auto;
+            font-size: 25;
+            border-radius: 20px;
+            border: 0;
+            background-color: rgb(108, 116, 118);
+            color: whitesmoke;
+            margin-top: 5px;
+        }
+        .setup:focus{
+            outline: none;
+        }
+        .setup-box{
+            position: fixed;
+            width: 300px;
+            height: 200px;
+            border: 1px solid black;
+            left: 50%;
+            top: 50%;
+            margin-left:-150px;
+            margin-top: -100px;
+            background-color: white;
+            border-radius: 30px;
+            z-index: 11;
+            box-shadow: 0 0 10px rgb(66, 66, 66);
+        }
+        .background{
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.521);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="box" id="timer1">
+        <div type="text" class="timer-title">
+            Title
+        </div>
+        <ul class="time">
+            <li class="hour">
+                0
+            </li>
+            <li> : </li>
+            <li class="min">
+                0
+            </li>
+            <li> : </li>
+            <li class="sec">
+                0
+            </li>
+        </ul>
+        <input type="button" class="start-btn" onclick="start('timer1')" value="start">
+        <input type="button" class="setup" value="setup">
+    </div>
+    <div class="setup-box">
+    </div>
+    <div class="background">
+    </div>
+    <input type="button" class="add" value="+">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        let timers = {};
+        function start(timer){
+            if(!timers[timer] || timers[timer].state == 'stop'){
+                if(!timers[timer]) timers[timer] = { hour:0, min:0, sec:0, dir: 'down'};
+                timers[timer].state = 'run';
+                $(`#${timer} .start-btn`).removeClass('start-btn').addClass('stop-btn').val("stop");
+                timers[timer].interval = setInterval(()=>{
+                if(timers[timer].dir == 'down')
+                    countDown(timer)
+                else countUp(timer)
+                },1000);
+            } else{
+                $(`#${timer} .stop-btn`).addClass('start-btn').removeClass('stop-btn').val("start");
+
+                timers[timer].state = 'stop';
+                clearInterval(timers[timer].interval);
+            }
+        }
+        function countDown(timer){
+            if(timers[timer].sec == 0){
+                if(timers[timer].min == 0){
+                    if(timers[timer].hour == 0){
+                        $(`#${timer} li`).css('color','red');
+                        timers[timer].dir = 'up';
+                        return countUp(timer);
+                    }
+                    else timers[timer].hour--;
+                    timers[timer].min = 59;
+                }else timers[timer].min--;
+                timers[timer].sec = 59;
+            } else timers[timer].sec--;
+            setTimer(timer)
+        }
+        function countUp(timer){
+            if(timers[timer].sec == 59){
+                timers[timer].sec = 0;
+                if(timers[timer].min == 59){
+                    timers[timer].min = 0;
+                    timers[timer].hour++;
+                }else timers[timer].min++;
+            } else timers[timer].sec++;
+            setTimer(timer)
+        }
+        function setTimer(timer){
+            $(`#${timer} li.hour`).empty().append(timers[timer].hour);
+            $(`#${timer} li.min`).empty().append(timers[timer].min);
+            $(`#${timer} li.sec`).empty().append(timers[timer].sec);
+        }
+    </script>
+</body>
+</html>
